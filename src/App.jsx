@@ -3,11 +3,12 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-import actions from './actions/noteActions'
+import { toggleImportance, initializeNotes } from './reducers/noteReducer'
 import { useSelector, useDispatch } from 'react-redux'
 import NoteForm from './components/NoteForm'
 import VisibilityFilter from './components/VisibilityFilter'
-
+import noteService from './services/notes'
+import { useEffect } from 'react'
 
 const Note = ({note, handleToggleImportance}) => {
   return (
@@ -28,17 +29,17 @@ const App = () => {
     return state.filter === 'IMPORTANT' ? state.notes.filter(note => note.important) : state.notes.filter(note => !note.important)
   })
 
-  const toggleImportance = (id) => {
-    dispatch(actions.toggleImportance(id))
-    // setDef(!def)
-  }
+  useEffect(()  => {
+    dispatch(initializeNotes())
+  }, [])
+
   return(
     <div>
       <NoteForm />
       <VisibilityFilter />
       <ul>
         {notes.map(note =>
-          <Note note={note} handleToggleImportance={() => toggleImportance(note.id)} />
+          <Note note={note} handleToggleImportance={() => dispatch(toggleImportance({id: note.id})) } />
         )}
       </ul>
     </div>
