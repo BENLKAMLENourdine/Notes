@@ -29,6 +29,11 @@
       "content": "JK",
       "important": false,
       "id": 6
+    },
+    {
+      "content": "new note",
+      "important": false,
+      "id": 7
     }
   ]
 }

@@ -1,9 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux'
 import { createNote } from '../reducers/noteReducer'
-import noteService from '../services/notes'
-
-const generateId = () =>
-  Number((Math.random() * 1000000).toFixed(0))
 
 const NoteForm = () => {
     const dispatch = useDispatch()
