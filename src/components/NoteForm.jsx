@@ -1,15 +1,29 @@
-import { useSelector, useDispatch } from 'react-redux'
-import { createNote } from '../reducers/noteReducer'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { createNote } from '../requests/requests'
 
 const NoteForm = () => {
-    const dispatch = useDispatch()
+    const queryClient = useQueryClient()
+
+    const noteMutation = useMutation({
+        mutationFn: createNote,
+        onSuccess: (newNote) => {
+            // this re-fetches the notes data
+            // queryClient.invalidateQueries({
+            //     queryKey: ['notes']
+            // })
+            const notes = queryClient.getQueryData(['notes'])
+            queryClient.setQueryData(['notes'], notes.concat(newNote))
+        }
+      })
 
     const addNote = async (event) => {
         event.preventDefault()
         const content = event.target.note.value
         event.target.note.value = ''
-        dispatch(createNote(content))
-        // setDef(!def)
+        noteMutation.mutate({
+            content,
+            important: true
+        })
       }
 
     return (

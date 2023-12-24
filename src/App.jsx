@@ -1,20 +1,16 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import {
   BrowserRouter as Router,
   Routes, Route, Link
 } from 'react-router-dom'
 
-import { toggleImportance, initializeNotes } from './reducers/noteReducer'
-import { useSelector, useDispatch } from 'react-redux'
 import NoteForm from './components/NoteForm'
 import VisibilityFilter from './components/VisibilityFilter'
-import noteService from './services/notes'
-import { useEffect } from 'react'
 import Notes from './components/Notes'
 import Home from './components/Home'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getNotes, updateNote } from './requests/requests'
+
 const Note = ({note, handleToggleImportance}) => {
   return (
     <li
@@ -27,20 +23,41 @@ const Note = ({note, handleToggleImportance}) => {
 }
 
 const App = () => {
-  const dispatch = useDispatch()
-  const notes = useSelector(state => {
-    if (state.filter === 'ALL') return state.notes
 
-    return state.filter === 'IMPORTANT' ? state.notes.filter(note => note.important) : state.notes.filter(note => !note.important)
+  const queryClient = useQueryClient()
+
+  const result = useQuery({
+    queryKey: ['notes'],
+    queryFn: getNotes
   })
 
-  useEffect(()  => {
-    dispatch(initializeNotes())
-  }, [])
+  const noteMutation = useMutation({
+    mutationFn: updateNote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['notes']
+      })
+    }
+  })
+
+  console.log(JSON.parse(JSON.stringify(result)))
 
   const padding = {
     padding: 5
   }
+
+  if (result.isLoading) return (
+    <div>Loading Notes</div>
+  )
+
+  const notes = result.data
+
+const toggleImportance = (note) => {
+  noteMutation.mutate({
+    ...note,
+    important: !note.important
+  })
+}
 
   return(
     <div>
@@ -65,7 +82,7 @@ const App = () => {
       <VisibilityFilter />
       <ul>
         {notes.map(note =>
-          <Note note={note} handleToggleImportance={() => dispatch(toggleImportance({id: note.id})) } />
+          <Note key={note.id} note={note} handleToggleImportance={() => toggleImportance(note) } />
         )}
       </ul>
     </div>

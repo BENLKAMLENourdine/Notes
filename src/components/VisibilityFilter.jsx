@@ -1,17 +1,15 @@
-import { useDispatch } from "react-redux"
 import filterAction from "../actions/filterAction"
 
 const VisibilityFilter = () => {
-    const dispatch = useDispatch()
 
     return (
         <div>
         all          <input type="radio" name="filter"
-          onChange={() => dispatch(filterAction('ALL')) } />
+          onChange={() => console.log('dispatch ALL') } />
         important    <input type="radio" name="filter"
-          onChange={() => dispatch(filterAction('IMPORTANT'))} />
+          onChange={() => console.log('IMPORTANT')} />
         nonimportant <input type="radio" name="filter"
-          onChange={() => dispatch(filterAction('NONIMPORTANT'))} />
+          onChange={() => console.log('NONIMPORTANT')} />
       </div>
     )
 }
